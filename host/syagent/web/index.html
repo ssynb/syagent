@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111316">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="syagent">
+  <title>syagent</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Conversations">
+      <div class="sidebar-head">
+        <span class="brand"><img src="icons/icon-192.png" alt="" width="24" height="24">syagent</span>
+        <button class="icon-btn" id="new-chat" type="button" aria-label="New conversation" title="New conversation">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+      </div>
+      <nav class="conv-list" id="conv-list"></nav>
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open conversations" aria-controls="sidebar" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <h1 class="conv-title" id="conv-title">New conversation</h1>
+        <button class="status-pill" id="status-pill" type="button" title="Agent status" aria-haspopup="dialog" data-state="unknown">
+          <span class="dot" aria-hidden="true"></span><span id="status-text">Connecting…</span>
+        </button>
+        <button class="icon-btn" id="settings-btn" type="button" aria-label="Agent controls" title="Agent controls">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+        </button>
+      </header>
+
+      <div class="banner" id="login-banner" role="alert" hidden>
+        Not signed in to ChatGPT. Run <code>syagent login</code> on the host machine.
+      </div>
+
+      <section class="thread" id="thread" aria-labelledby="conv-title">
+        <div class="messages" id="messages" aria-live="polite"></div>
+        <div class="empty" id="empty" hidden>
+          <img src="icons/icon-192.png" alt="" width="56" height="56">
+          <h2>What should we work on?</h2>
+          <p>Send a message or a file. Rate any reply to teach the agent what you want.</p>
+        </div>
+      </section>
+
+      <form class="composer" id="composer">
+        <div class="composer-box" id="composer-box">
+          <div class="pending" id="pending" hidden></div>
+          <textarea id="input" rows="1" placeholder="Message syagent" aria-label="Message" autocomplete="off"></textarea>
+          <div class="composer-row">
+            <input type="file" id="file-input" multiple hidden>
+            <button class="icon-btn" id="attach-btn" type="button" aria-label="Attach files" title="Attach files">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 11-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2L9.8 17a1.8 1.8 0 0 1-2.6-2.6l8-8"/></svg>
+            </button>
+            <span class="composer-hint" id="composer-hint"></span>
+            <button class="send-btn" id="send-btn" type="submit" aria-label="Send" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <dialog class="sheet" id="panel" aria-labelledby="panel-title">
+    <div class="sheet-head">
+      <h2 id="panel-title">Agent</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <section class="panel-section" aria-labelledby="proc-title">
+        <h3 id="proc-title">Process</h3>
+        <div class="proc-row">
+          <p class="proc-status" id="panel-status"></p>
+          <button class="btn" type="button" id="restart-btn">Restart agent</button>
+        </div>
+      </section>
+      <section class="panel-section" aria-labelledby="commits-title">
+        <div class="section-head">
+          <h3 id="commits-title">Code history</h3>
+          <button class="btn" type="button" id="rollback-healthy-btn">Roll back to last healthy</button>
+        </div>
+        <ol class="rows" id="commit-list"></ol>
+      </section>
+      <section class="panel-section" aria-labelledby="snaps-title">
+        <div class="section-head">
+          <h3 id="snaps-title">Snapshots</h3>
+          <button class="btn" type="button" id="snapshot-btn">Create snapshot</button>
+        </div>
+        <ol class="rows" id="snapshot-list"></ol>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog class="confirm" id="confirm" aria-labelledby="confirm-title" aria-describedby="confirm-body">
+    <form method="dialog">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-body"></p>
+      <div class="confirm-actions">
+        <button class="btn" value="cancel">Cancel</button>
+        <button class="btn danger" value="ok" id="confirm-ok"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite" popover="manual"></div>
+</body>
+</html>

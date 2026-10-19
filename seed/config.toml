@@ -1,0 +1,4 @@
+# Empty model = first model listed for this account.
+model = ""
+reasoning_effort = "high"
+base_url = "https://api.openai.com/v1"

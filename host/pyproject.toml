@@ -1,0 +1,32 @@
+[project]
+name = "syagent"
+version = "0.1.0"
+description = "syagent host: web chat, records, credentials and recovery for a sandboxed self-evolving agent"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.146.0",
+    "uvicorn>=0.54.0",
+    "httpx>=0.28.1",
+    "pyjwt[crypto]>=2.15.1",
+    "python-multipart>=0.0.32",
+]
+
+[project.scripts]
+syagent = "syagent.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

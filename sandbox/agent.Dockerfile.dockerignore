@@ -1,0 +1,6 @@
+*
+!seed/
+!sandbox/agent-entrypoint.sh
+seed/tests
+**/__pycache__
+**/.pytest_cache
